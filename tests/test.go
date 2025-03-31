@@ -1,4 +1,4 @@
-package graph_test
+package tests
 
 import (
 	"context"
@@ -8,8 +8,8 @@ import (
 
 	"time"
 
-	"ozon_test/db"
 	"ozon_test/graph"
+	"ozon_test/storage"
 
 	//"github.com/lookandhqte/ozon_test/graph/model"
 	//"github.com/google/uuid"
@@ -17,7 +17,7 @@ import (
 )
 
 func setupTestDB() {
-	db.DB = db.NewMemoryStorage()
+	storage.DB = storage.NewMemoryStorage()
 }
 
 func TestMain(m *testing.M) {
@@ -28,7 +28,7 @@ func TestMain(m *testing.M) {
 // Тест создания поста
 func TestCreatePost(t *testing.T) {
 	// Создаем in-memory хранилище перед тестом
-	db.DB = db.NewMemoryStorage()
+	storage.DB = storage.NewMemoryStorage()
 
 	resolver := &graph.Resolver{} // Используем указатель, чтобы передавать структуру по ссылке
 	ctx := context.Background()
@@ -45,7 +45,7 @@ func TestCreatePost(t *testing.T) {
 
 // Тест добавления комментария
 func TestAddComment(t *testing.T) {
-	db.DB = db.NewMemoryStorage() // Инициализируем хранилище
+	storage.DB = storage.NewMemoryStorage() // Инициализируем хранилище
 
 	resolver := &graph.Resolver{}
 	ctx := context.Background()
@@ -67,7 +67,7 @@ func TestAddComment(t *testing.T) {
 
 // Тест получения поста с комментариями
 func TestGetPostWithComments(t *testing.T) {
-	db.DB = db.NewMemoryStorage() // Инициализируем хранилище
+	storage.DB = storage.NewMemoryStorage() // Инициализируем хранилище
 
 	resolver := &graph.Resolver{}
 	ctx := context.Background()
@@ -103,7 +103,7 @@ func TestCreatePostWithoutComments(t *testing.T) {
 
 // Тест добавления комментария к посту, где они запрещены
 func TestAddCommentToPostWithDisabledComments(t *testing.T) {
-	db.DB = db.NewMemoryStorage() // Инициализируем хранилище
+	storage.DB = storage.NewMemoryStorage() // Инициализируем хранилище
 
 	resolver := &graph.Resolver{}
 	ctx := context.Background()
@@ -121,7 +121,7 @@ func TestAddCommentToPostWithDisabledComments(t *testing.T) {
 }
 
 func TestFullProcess(t *testing.T) {
-	db.DB = db.NewMemoryStorage() // Инициализируем хранилище
+	storage.DB = storage.NewMemoryStorage() // Инициализируем хранилище
 
 	resolver := &graph.Resolver{}
 	ctx := context.Background()
@@ -156,7 +156,7 @@ func TestFullProcess(t *testing.T) {
 	}
 }
 func TestPaginationComments(t *testing.T) {
-	db.DB = db.NewMemoryStorage() // Инициализируем in-memory хранилище
+	storage.DB = storage.NewMemoryStorage() // Инициализируем in-memory хранилище
 
 	resolver := &graph.Resolver{}
 	ctx := context.Background()
@@ -204,7 +204,7 @@ func TestPaginationComments(t *testing.T) {
 	assert.Equal(t, 0, len(emptyPage), "Пустая страница должна возвращать 0 комментариев")
 }
 func TestNestedComments(t *testing.T) {
-	db.DB = db.NewMemoryStorage() // Используем in-memory хранилище
+	storage.DB = storage.NewMemoryStorage() // Используем in-memory хранилище
 
 	resolver := &graph.Resolver{}
 	ctx := context.Background()
@@ -235,7 +235,7 @@ func TestNestedComments(t *testing.T) {
 	assert.Equal(t, 3, len(comments), "Должно быть 3 комментария (включая вложенные)")
 }
 func TestCommentSubscription(t *testing.T) {
-	db.DB = db.NewMemoryStorage() // In-memory хранилище
+	storage.DB = storage.NewMemoryStorage() // In-memory хранилище
 
 	resolver := &graph.Resolver{}
 	ctx := context.Background()

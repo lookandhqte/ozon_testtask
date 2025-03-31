@@ -8,8 +8,8 @@ import (
 	"errors"
 	"time"
 
-	"ozon_test/db"
 	"ozon_test/graph/model"
+	"ozon_test/storage"
 
 	"github.com/google/uuid"
 )
@@ -27,7 +27,7 @@ func (r *mutationResolver) CreatePost(ctx context.Context, title string, content
 		CreatedAt:       time.Now().Format(time.RFC3339),
 	}
 
-	err := db.DB.CreatePost(post)
+	err := storage.DB.CreatePost(post)
 	if err != nil {
 		return nil, err
 	}
@@ -36,7 +36,7 @@ func (r *mutationResolver) CreatePost(ctx context.Context, title string, content
 
 // Добавление комментария
 func (r *mutationResolver) AddComment(ctx context.Context, postID string, parentID *string, author, content string) (*model.Comment, error) {
-	post, err := db.DB.GetPostByID(postID)
+	post, err := storage.DB.GetPostByID(postID)
 
 	if err != nil || post == nil {
 		return nil, errors.New("пост не найден")
@@ -58,7 +58,7 @@ func (r *mutationResolver) AddComment(ctx context.Context, postID string, parent
 		CreatedAt: time.Now().Format(time.RFC3339),
 	}
 
-	err = db.DB.CreateComment(comment)
+	err = storage.DB.CreateComment(comment)
 	if err != nil {
 		return nil, err
 	}
@@ -68,18 +68,18 @@ func (r *mutationResolver) AddComment(ctx context.Context, postID string, parent
 
 // Получение всех постов
 func (r *queryResolver) Posts(ctx context.Context) ([]*model.Post, error) {
-	return db.DB.GetAllPosts()
+	return storage.DB.GetAllPosts()
 }
 
 // Получение поста по ID
 func (r *queryResolver) Post(ctx context.Context, id string) (*model.Post, error) {
-	post, err := db.DB.GetPostByID(id)
+	post, err := storage.DB.GetPostByID(id)
 	if err != nil || post == nil {
 		return nil, errors.New("пост не найден")
 	}
 
 	// Загрузка комментариев к посту
-	comments, err := db.DB.GetCommentsByPostID(id, 10, 0)
+	comments, err := storage.DB.GetCommentsByPostID(id, 10, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -90,7 +90,7 @@ func (r *queryResolver) Post(ctx context.Context, id string) (*model.Post, error
 
 // Получение комментариев к посту с поддержкой пагинации
 func (r *queryResolver) Comments(ctx context.Context, postID string, limit int, offset int) ([]*model.Comment, error) {
-	return db.DB.GetCommentsByPostID(postID, limit, offset)
+	return storage.DB.GetCommentsByPostID(postID, limit, offset)
 }
 
 // Поддержка подписки на новые комментарии (GraphQL Subscriptions)
@@ -101,7 +101,7 @@ func (r *subscriptionResolver) CommentAdded(ctx context.Context, postID string) 
 		for {
 			// Ожидаем новый комментарий в БД
 			time.Sleep(1 * time.Second)
-			comments, _ := db.DB.GetCommentsByPostID(postID, 1, 0) // Получаем последний комментарий
+			comments, _ := storage.DB.GetCommentsByPostID(postID, 1, 0) // Получаем последний комментарий
 			if len(comments) > 0 {
 				commentChan <- comments[0] // Отправляем реальный комментарий
 			}

@@ -6,8 +6,8 @@ import (
 	"os"
 
 	"ozon_test/config"
-	"ozon_test/db"
 	"ozon_test/graph"
+	"ozon_test/storage"
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
@@ -17,7 +17,7 @@ func main() {
 	// Загружаем конфиг
 	cfg := config.LoadConfig()
 	// Инициализируем хранилище
-	db.InitStorage(cfg)
+	storage.InitStorage(cfg)
 
 	// GraphQL-сервер
 	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))

@@ -6,19 +6,19 @@ import (
 
 type Config struct {
 	StorageType string
-	PostgresDSN string // Строка подключения к рostgreSQL
+	DSN         string
 }
 
 func LoadConfig() *Config {
 	storageType := os.Getenv("STORAGE_TYPE")
 	if storageType == "" {
-		storageType = "memory" // по умолчанию
+		storageType = "memory"
 	}
 
-	postgresDSN := os.Getenv("POSTGRES_DSN")
+	dsn := os.Getenv("POSTGRES_DSN")
 
 	return &Config{
 		StorageType: storageType,
-		PostgresDSN: postgresDSN,
+		DSN:         dsn,
 	}
 }
