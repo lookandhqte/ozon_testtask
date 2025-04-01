@@ -1,8 +1,6 @@
 package config
 
-import (
-	"os"
-)
+import "os"
 
 type Config struct {
 	StorageType string
@@ -10,15 +8,17 @@ type Config struct {
 }
 
 func LoadConfig() *Config {
-	storageType := os.Getenv("STORAGE_TYPE")
-	if storageType == "" {
-		storageType = "memory"
+	config := &Config{
+		StorageType: getEnvOrDefault("STORAGE_TYPE", "memory"),
+		DSN:         os.Getenv("POSTGRES_DSN"),
 	}
+	return config
+}
 
-	dsn := os.Getenv("POSTGRES_DSN")
-
-	return &Config{
-		StorageType: storageType,
-		DSN:         dsn,
+func getEnvOrDefault(key, defaultValue string) string {
+	value := os.Getenv(key)
+	if value == "" {
+		return defaultValue
 	}
+	return value
 }
